@@ -1,0 +1,8 @@
+# Source photo files — only the converted/resized versions get deployed
+assets/*.HEIC
+assets/IMG_6402.JPG
+
+# macOS / editor cruft
+.DS_Store
+.vscode/
+*.swp

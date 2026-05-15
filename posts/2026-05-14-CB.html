@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ContinuousBench — Peihan Liu</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <style>
+    :root {
+      --code-bg: #f5f6f7;
+      /* benchmark color encodes track; shade encodes training regime */
+      --gem-1:  #b9d9eb;  --gem-2:  #6cace4;  --gem-3:  #1e4f8b;
+      --news-1: #fde68a;  --news-2: #f59e0b;  --news-3: #b45309;
+      --gray-1: #cbd5e1;  --gray-2: #94a3b8;  --gray-3: #475569;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --code-bg: #1c1c1b;
+        --gem-1:  #1e4f8b;  --gem-2:  #6cace4;  --gem-3:  #9bcbeb;
+        --news-1: #78350f;  --news-2: #d97706;  --news-3: #fbbf24;
+        --gray-1: #475569;  --gray-2: #94a3b8;  --gray-3: #cbd5e1;
+      }
+    }
+
+    article figure { margin: 1.6em 0; }
+    article figure svg { display: block; width: 100%; height: auto; max-width: 720px; margin: 0 auto; }
+    article figcaption { color: var(--muted); font-size: 0.88em; text-align: center; margin-top: 0.4em; }
+
+    .tldr {
+      border-left: 3px solid var(--accent);
+      background: var(--accent-soft);
+      padding: 0.6em 1em;
+      margin: 1.2em 0 1.6em;
+      border-radius: 0 4px 4px 0;
+    }
+    .tldr p { margin: 0; }
+    .tldr strong {
+      color: var(--fg);
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .pipeline { margin: 1.6em 0; }
+    .step { margin: 0; }
+    .step-label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+    .step-label .step-note {
+      color: var(--muted);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 0.82rem;
+      margin-left: 0.5em;
+    }
+    .step pre {
+      background: var(--code-bg);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 0.7em 0.9em;
+      margin: 0;
+      font-size: 0.82em;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--fg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .step pre.prose {
+      font-family: inherit;
+      font-size: 0.92em;
+      font-style: italic;
+      line-height: 1.6;
+    }
+    .step-arrow {
+      display: block;
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin: 0.5em 0 0.5em 1em;
+      line-height: 1;
+    }
+    .step-arrow span {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-left: 0.4em;
+    }
+
+    .tabs { margin: 1.6em 0; }
+    .tab-bar {
+      display: flex;
+      gap: 1.2em;
+      border-bottom: 1px solid var(--rule);
+      margin-bottom: 1.1em;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 0.5em 0;
+      margin-bottom: -1px;
+      font: inherit;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      letter-spacing: 0.02em;
+    }
+    .tab-btn:hover { color: var(--fg); }
+    .tab-btn[aria-selected="true"] {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+    #tab-news[aria-selected="true"] {
+      color: var(--news-3);
+      border-bottom-color: var(--news-3);
+    }
+    .tab-panel[hidden] { display: none; }
+
+    /* News panel uses amber accents to match its tab */
+    #panel-news .step-label,
+    #panel-news .step-arrow { color: var(--news-3); }
+
+    /* SVG chart styles — theme-aware */
+    .chart .grid { stroke: var(--rule); stroke-width: 1; }
+    .chart .ax   { stroke: var(--rule); stroke-width: 1; }
+    .chart .tk   { fill: var(--muted); font: 10px -apple-system, system-ui, sans-serif; }
+    .chart .xl   { fill: var(--fg); font: 11.5px -apple-system, system-ui, sans-serif; text-anchor: middle; }
+    .chart .xl.gem-label  { font-weight: 600; fill: var(--gem-3); }
+    .chart .xl.news-label { font-weight: 600; fill: var(--news-3); }
+    .chart .vl   { fill: var(--fg); font: 9px -apple-system, system-ui, sans-serif; text-anchor: middle; }
+    .chart .lg   { fill: var(--fg); font: 11px -apple-system, system-ui, sans-serif; }
+    .chart .gem-1  { fill: var(--gem-1); }
+    .chart .gem-2  { fill: var(--gem-2); }
+    .chart .gem-3  { fill: var(--gem-3); }
+    .chart .news-1 { fill: var(--news-1); }
+    .chart .news-2 { fill: var(--news-2); }
+    .chart .news-3 { fill: var(--news-3); }
+    .chart .gray-1 { fill: var(--gray-1); }
+    .chart .gray-2 { fill: var(--gray-2); }
+    .chart .gray-3 { fill: var(--gray-3); }
+
+    article code { background: var(--code-bg); padding: 0.05em 0.3em; border-radius: 3px; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <main>
+    <p><a href="../index.html">&larr; back</a></p>
+    <article>
+      <h1>ContinuousBench: does DP synthetic text actually transfer knowledge?</h1>
+      <p class="tagline"><time datetime="2026-05-15">May 15, 2026</time></p>
+
+      <div class="tldr">
+        <p>
+          <strong>TL;DR.</strong> We built <em>ContinuousBench</em>, a benchmark that measures
+          whether differentially private (DP) synthetic text retains the corpus-specific knowledge
+          that motivated using a sensitive dataset in the first place. On standard benchmarks like
+          IMDB sentiment and OpenReview, every method looks roughly the same (mid-90s%) — there is
+          no room left to distinguish them. On ContinuousBench, training on the real corpus jumps a
+          Gemma 3 4B model from ~1% to ~96% on the Geminon track and from ~14% to ~70% on the News
+          track. SOTA DP synthesis barely closes that gap — <strong>even at ε = 100</strong>. We
+          release a corpus, QA set, and standardized harness, and we regenerate it quarterly to
+          stay contamination-free.
+        </p>
+      </div>
+
+      <h2>What's wrong with current evaluations</h2>
+
+      <p>
+        DP text synthesis promises a way to learn from sensitive corpora — clinical notes, legal
+        records, internal documents — through a privacy-preserving release. But the question that
+        matters isn't <em>"does the output look like the original?"</em> It's: <em>does it transmit
+        the capabilities you would have gotten by training on the real data?</em>
+      </p>
+
+      <p>Existing evaluations don't answer this, for three reasons:</p>
+
+      <ol>
+        <li>
+          <strong>The knowledge is already in the base model.</strong> IMDB sentiment,
+          classification-style tasks on familiar domains — modern pretrained LLMs already solve
+          these out of the box. Strong downstream numbers don't prove the corpus mattered; they
+          prove pretraining was enough.
+        </li>
+        <li>
+          <strong>The metrics measure style, not knowledge.</strong> MAUVE, BLEU, next-token loss,
+          distributional similarity — all reward stylistic matching. A DP generator can ace these
+          while losing every specific fact in the source corpus.
+        </li>
+        <li>
+          <strong>Teacher–student distillation contaminates the signal.</strong> Synthetic data is
+          usually generated by a model much stronger than the one trained on it. The downstream
+          gains then conflate corpus signal with ordinary distillation from a more capable teacher.
+        </li>
+      </ol>
+
+      <p>
+        The visible symptom is saturation. On the benchmarks the field actually uses, every method
+        sits within a few points of the ceiling:
+      </p>
+
+      <figure>
+        <svg class="chart" viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Bar chart comparing No training, DP-synth, and Train on real across IMDB, OpenReview, Geminon, and News">
+          <g>
+            <line x1="60"  y1="260"   x2="700" y2="260"   class="ax"/>
+            <line x1="60"  y1="202.5" x2="700" y2="202.5" class="grid"/>
+            <line x1="60"  y1="145"   x2="700" y2="145"   class="grid"/>
+            <line x1="60"  y1="87.5"  x2="700" y2="87.5"  class="grid"/>
+            <line x1="60"  y1="30"    x2="700" y2="30"    class="grid"/>
+            <text x="52" y="263" class="tk" text-anchor="end">0</text>
+            <text x="52" y="206" class="tk" text-anchor="end">25</text>
+            <text x="52" y="148" class="tk" text-anchor="end">50</text>
+            <text x="52" y="91"  class="tk" text-anchor="end">75</text>
+            <text x="52" y="33"  class="tk" text-anchor="end">100</text>
+          </g>
+
+          <!-- Group 1: OpenReview (gray family — saturated benchmark) -->
+          <g>
+            <rect x="80"  y="142" width="36" height="118" class="gray-1"/>
+            <rect x="122" y="133" width="36" height="127" class="gray-2"/>
+            <rect x="164" y="118" width="36" height="142" class="gray-3"/>
+            <text x="98"  y="138" class="vl">51</text>
+            <text x="140" y="129" class="vl">55</text>
+            <text x="182" y="114" class="vl">62</text>
+            <text x="140" y="278" class="xl">OpenReview</text>
+          </g>
+
+          <!-- Group 2: IMDB (gray family — saturated benchmark) -->
+          <g>
+            <rect x="240" y="43"  width="36" height="217" class="gray-1"/>
+            <rect x="282" y="39"  width="36" height="221" class="gray-2"/>
+            <rect x="324" y="37"  width="36" height="223" class="gray-3"/>
+            <text x="258" y="39"  class="vl">94</text>
+            <text x="300" y="35"  class="vl">96</text>
+            <text x="342" y="33"  class="vl">97</text>
+            <text x="300" y="278" class="xl">IMDB</text>
+          </g>
+
+          <!-- Group 3: Geminon (blue family) -->
+          <g>
+            <rect x="400" y="257.5" width="36" height="2.5" class="gem-1"/>
+            <rect x="442" y="254"   width="36" height="6"   class="gem-2"/>
+            <rect x="484" y="37"    width="36" height="223" class="gem-3"/>
+            <text x="418" y="253" class="vl">1</text>
+            <text x="460" y="250" class="vl">3</text>
+            <text x="502" y="33"  class="vl">97</text>
+            <text x="460" y="278" class="xl gem-label">Geminon (ours)</text>
+          </g>
+
+          <!-- Group 4: News (amber family) -->
+          <g>
+            <rect x="560" y="227.6" width="36" height="32.4" class="news-1"/>
+            <rect x="602" y="214.9" width="36" height="45.1" class="news-2"/>
+            <rect x="644" y="113"   width="36" height="147"  class="news-3"/>
+            <text x="578" y="223" class="vl">14</text>
+            <text x="620" y="210" class="vl">20</text>
+            <text x="662" y="109" class="vl">64</text>
+            <text x="620" y="278" class="xl news-label">News (ours)</text>
+          </g>
+
+          <!-- Legend: shade = training regime; hue = benchmark (see caption) -->
+          <g transform="translate(60,300)">
+            <rect x="0"   y="0" width="12" height="12" class="gray-1"/>
+            <text x="18"  y="10" class="lg">No training</text>
+            <rect x="120" y="0" width="12" height="12" class="gray-2"/>
+            <text x="138" y="10" class="lg">Train on DP-synth</text>
+            <rect x="270" y="0" width="12" height="12" class="gray-3"/>
+            <text x="288" y="10" class="lg">Train on real</text>
+          </g>
+        </svg>
+        <figcaption>
+          Downstream accuracy of Gemma 3 4B after three increasingly informative training regimes.
+          IMDB and OpenReview are saturated (≤ 3 pp gap between &ldquo;no training&rdquo; and
+          &ldquo;real corpus&rdquo;). ContinuousBench has +94 pp on Geminon and +50 pp on News.
+          Hue encodes benchmark (gray = saturated, blue = Geminon, amber = News);
+          shade encodes training regime (light → dark = no training → real corpus).
+        </figcaption>
+      </figure>
+
+      <h2>ContinuousBench</h2>
+
+      <p>
+        Each release packages three things: a fresh training corpus, a derived short-answer QA set,
+        and a standardized training/eval harness. Three design choices fall out of the diagnosis
+        above:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Freshness.</strong> QA tests knowledge unavailable to the base model — either
+          procedurally generated fictional facts (the <em>Geminon</em> track, a Pokémon-inspired
+          invented world) or post-cutoff news (the <em>News</em> track, from CC-News).
+        </li>
+        <li>
+          <strong>Grounded QA, not style.</strong> Every question has a normalized short answer
+          scored automatically. No MAUVE-style proxies.
+        </li>
+        <li>
+          <strong>DP-learnable by construction.</strong> Every test question is supported by ≥200
+          independent records, so the target is population-level knowledge rather than singleton
+          memorization. A singleton split is kept as a privacy sanity check.
+        </li>
+      </ul>
+
+      <p>
+        To eliminate teacher–student confounds, the harness uses the <em>same</em> base checkpoint
+        for the generator and the downstream model. The two tracks differ in how the corpus is
+        seeded — Geminon from a procedurally generated index, News from CC-News articles:
+      </p>
+
+      <div class="tabs" data-tabs>
+        <div role="tablist" class="tab-bar" aria-label="Pipeline track">
+          <button role="tab" id="tab-geminon" aria-selected="true"
+                  aria-controls="panel-geminon" class="tab-btn">Geminon</button>
+          <button role="tab" id="tab-news" aria-selected="false"
+                  aria-controls="panel-news" class="tab-btn" tabindex="-1">News</button>
+        </div>
+
+        <div role="tabpanel" id="panel-geminon" aria-labelledby="tab-geminon" class="tab-panel">
+          <div class="pipeline">
+            <div class="step">
+              <span class="step-label">
+                Index entry <span class="step-note">structured source fact</span>
+              </span>
+              <pre><code>
+                {
+                  "name": "Boreling",
+                  "classification": "Frost Geminon",
+                  "type1": "ice",
+                  "type2": null,
+                  "ability": "Berserk",
+                  "hp": 69,
+                  "attack": 60,
+                  "defense": 63,
+                  "special attack": 67,
+                  "special defense": 68,
+                  "speed": 40,
+                  "base_stat_total": 367,
+                  "weight": 52,
+                  "height": 12,
+                  "idx": 10003,
+                  "evolution_line": ["Boreling", "Borelash", "Borastat"],
+                  "move": {
+                    "name": "Powder Snow",
+                    "short_description": "Has a chance to freeze the target."
+                  }
+                }
+              </code></pre>
+            </div>
+
+            <div class="step-arrow">↓ <span>rendered into prose for training</span></div>
+
+            <div class="step">
+              <span class="step-label">
+                Synthesized record <span class="step-note">one of ≥200 paraphrases</span>
+              </span>
+              <pre><code>
+                {
+                  "text": "As the first stage in the evolutionary line that culminates in Borastat, Boreling is a quintessential Frost Geminon. This pure ice-type, known as Gemidex entry #10003, measures 12 meters in height and weighs 52 lbs.  Its passive ability is Berserk, and it can be taught the move Powder Snow, which has a percentage-based chance to freeze an opponent. Boreling's base stat total of 367 is comprised of 69 HP, 60 attack, 63 defense, 67 special attack, 68 special defense, and a speed rating of 40.",
+                  "tag": [
+                    {
+                      "idx": 10003,
+                      "info": [
+                        "idx",
+                        "name",
+                        "classification",
+                        "type1",
+                        "ability",
+                        "evolution_line",
+                        "height",
+                        "weight",
+                        "base_stat_total",
+                        "hp",
+                        "attack",
+                        "defense",
+                        "special attack",
+                        "special defense",
+                        "speed",
+                        "move.name",
+                        "move.short_description"
+                      ]
+                    }
+                  ],
+                  "type": "wiki"
+                }
+              </code></pre>
+            </div>
+
+            <div class="step-arrow">↓ <span>derived as short-answer eval</span></div>
+
+            <div class="step">
+              <span class="step-label">
+                QA pair <span class="step-note">normalized, exact-match scored</span>
+              </span>
+              <pre><code>
+                {
+                  "question": "What is the classification of Boreling?"
+                  "answer": "Frost Geminon"
+                }
+                {
+                  "question": "What are the types of Boreling?"
+                  "answer": "Ice"
+                }
+                ...
+              </code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div role="tabpanel" id="panel-news" aria-labelledby="tab-news" class="tab-panel" hidden>
+          <div class="pipeline">
+            <div class="step">
+              <span class="step-label">
+                Source article <span class="step-note">CC-News, post-cutoff</span>
+              </span>
+              <pre><code>
+                {
+                  "url": "https://www.hindustantimes.com/cricket/pakistan-knock-on-iccs-door-...",
+                  "hostname": "www.hindustantimes.com",
+                  "title": "Pakistan knocks on ICC's door, demands immediate removal of match referee...",
+                  "date": "2025-09-15",
+                  "crawl_date": "2025-09-15T09:31:13Z",
+                  "language": "en",
+                  "text": "Pakistan knocks on ICC's door, demands immediate removal of match referee for staying silent on India's no handshake. The PCB has escalated India's no-handshake controversy to the ICC, asking for the immediate removal of match referee Andy Pycroft..."
+                }
+              </code></pre>
+            </div>
+
+            <div class="step-arrow">↓ <span>fact-anchored question across ≥200 supporting articles</span></div>
+
+            <div class="step">
+              <span class="step-label">
+                QA pair <span class="step-note">with closed- and open-book baselines</span>
+              </span>
+              <pre><code>
+                {
+                  "question": "Who was the match referee for the India vs. Pakistan Asia Cup match on September 14, 2025?",
+                  "answer": "Andy Pycroft",
+                  "support_count": 648,
+                  "closedbook_gemini-2.5-pro": {
+                    "answer": "Javagal Srinath",
+                    "is_correct": false
+                  },
+                  "openbook_gemini-2.5-flash-lite": [
+                    { "article_id": 126152,  "answer": "Not mentioned", "is_correct": false },
+                    ...
+                    { "article_id": 1713242, "answer": "Not mentioned", "is_correct": false }
+                  ]
+                }
+              </code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Results</h2>
+
+      <p>
+        The headline number is the gap between non-private and DP synthesis. Non-private synthesis
+        (ε = ∞) <strong>nearly matches training on the real corpus</strong> — 92.5% vs 96.4% on
+        Geminon, 65.5% vs 70.4% on News. SOTA DP synthesis <strong>collapses</strong>: 13.7% / 20.6%
+        at ε = 100, and barely above no-training at ε = 10. Private Evolution — a popular
+        training-free DP method — falls <em>below</em> no-training on Geminon, because it can only
+        resample from the base model's proposal distribution, which doesn't contain the fresh facts
+        we test.
+      </p>
+
+      <figure>
+        <svg class="chart" viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Bar chart of accuracy across five training conditions on Geminon and News">
+          <line x1="60" y1="260"   x2="700" y2="260"   class="ax"/>
+          <line x1="60" y1="202.5" x2="700" y2="202.5" class="grid"/>
+          <line x1="60" y1="145"   x2="700" y2="145"   class="grid"/>
+          <line x1="60" y1="87.5"  x2="700" y2="87.5"  class="grid"/>
+          <line x1="60" y1="30"    x2="700" y2="30"    class="grid"/>
+          <text x="52" y="263" class="tk" text-anchor="end">0</text>
+          <text x="52" y="206" class="tk" text-anchor="end">25</text>
+          <text x="52" y="148" class="tk" text-anchor="end">50</text>
+          <text x="52" y="91"  class="tk" text-anchor="end">75</text>
+          <text x="52" y="33"  class="tk" text-anchor="end">100</text>
+
+          <!-- Group 1: No training -->
+          <g>
+            <rect x="83"  y="257.5" width="38" height="2.5"  class="gem-3"/>
+            <rect x="127" y="227.6" width="38" height="32.4" class="news-3"/>
+            <text x="102" y="253" class="vl">1</text>
+            <text x="146" y="223" class="vl">14</text>
+            <text x="124" y="278" class="xl">No training</text>
+          </g>
+
+          <!-- Group 2: DP-Syn ε=10 -->
+          <g>
+            <rect x="211" y="251.1" width="38" height="8.9"  class="gem-3"/>
+            <rect x="255" y="246.7" width="38" height="13.3" class="news-3"/>
+            <text x="230" y="247" class="vl">4</text>
+            <text x="274" y="242" class="vl">6</text>
+            <text x="252" y="278" class="xl">DP-Syn ε=10</text>
+          </g>
+
+          <!-- Group 3: DP-Syn ε=100 -->
+          <g>
+            <rect x="339" y="228.5" width="38" height="31.5" class="gem-3"/>
+            <rect x="383" y="212.7" width="38" height="47.3" class="news-3"/>
+            <text x="358" y="224" class="vl">14</text>
+            <text x="402" y="208" class="vl">21</text>
+            <text x="380" y="278" class="xl">DP-Syn ε=100</text>
+          </g>
+
+          <!-- Group 4: Syn ε=∞ -->
+          <g>
+            <rect x="467" y="47.25"  width="38" height="212.75" class="gem-3"/>
+            <rect x="511" y="109.24" width="38" height="150.76" class="news-3"/>
+            <text x="486" y="43"  class="vl">93</text>
+            <text x="530" y="105" class="vl">66</text>
+            <text x="508" y="278" class="xl">Syn (ε=∞)</text>
+          </g>
+
+          <!-- Group 5: Train on real -->
+          <g>
+            <rect x="595" y="38.28" width="38" height="221.72" class="gem-3"/>
+            <rect x="639" y="98.08" width="38" height="161.92" class="news-3"/>
+            <text x="614" y="34" class="vl">96</text>
+            <text x="658" y="94" class="vl">70</text>
+            <text x="636" y="278" class="xl">Train on real</text>
+          </g>
+
+          <!-- Legend -->
+          <g transform="translate(60,300)">
+            <rect x="0"   y="0" width="12" height="12" class="gem-3"/>
+            <text x="18"  y="10" class="lg">Geminon</text>
+            <rect x="100" y="0" width="12" height="12" class="news-3"/>
+            <text x="118" y="10" class="lg">News</text>
+          </g>
+        </svg>
+        <figcaption>
+          Downstream QA accuracy on ContinuousBench. Non-private synthesis nearly matches the real
+          corpus; SOTA DP synthesis at ε = 100 leaves an 80-point gap on Geminon. Gemma 3 4B,
+          matched generator × evaluator.
+        </figcaption>
+      </figure>
+
+      <p>
+        Put differently: DP generators today preserve the <em>form</em> of a corpus — its style,
+        topics, document structure — while losing the specific factual content that makes the data
+        valuable. Between ε = ∞ and ε = 10, MAUVE on Geminon drops by 0.10; QA accuracy drops by
+        88.6 percentage points. A method that cannot recover information attested across hundreds
+        of independent records has not meaningfully preserved the corpus, and closing that gap is
+        the central open problem for DP text synthesis. We hope ContinuousBench can serve as a
+        yardstick.
+      </p>
+
+      <p>
+        <a href="https://huggingface.co/ContinuousBench">Corpus, QA</a>, and
+        <a href="https://github.com/plau666/ContinuousBenchEval">eval harness</a> are released.<br>
+        See more curation and experimental details in <a href="#">paper</a>.
+      </p>
+    </article>
+  </main>
+  <script>
+    // Dedent <pre><code> blocks so source HTML can be indented naturally.
+    // Skips blocks marked .prose (single flowing line).
+    document.querySelectorAll('.pipeline pre:not(.prose) code').forEach(code => {
+      let text = code.textContent.replace(/^[ \t]*\n/, '').replace(/\n[ \t]*$/, '');
+      const indents = text.split('\n').filter(l => l.trim()).map(l => l.match(/^[ \t]*/)[0].length);
+      const min = indents.length ? Math.min(...indents) : 0;
+      code.textContent = text.split('\n').map(l => l.slice(min)).join('\n');
+    });
+
+    // Tab switching (Geminon / News pipelines)
+    document.querySelectorAll('[data-tabs]').forEach(group => {
+      const tabs = group.querySelectorAll('[role="tab"]');
+      const select = target => {
+        tabs.forEach(t => {
+          const on = t === target;
+          t.setAttribute('aria-selected', on);
+          t.tabIndex = on ? 0 : -1;
+          document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+        });
+      };
+      tabs.forEach((t, i) => {
+        t.addEventListener('click', () => select(t));
+        t.addEventListener('keydown', e => {
+          if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+            const dir = e.key === 'ArrowRight' ? 1 : -1;
+            const next = tabs[(i + dir + tabs.length) % tabs.length];
+            select(next);
+            next.focus();
+            e.preventDefault();
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

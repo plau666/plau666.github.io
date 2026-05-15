@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peihan Liu</title>
+  <meta name="description" content="Peihan Liu — CS PhD student at Columbia. Trustworthy machine learning: privacy, fairness, and ML." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main>
+
+    <header>
+      <img class="headshot" src="assets/me.jpg" alt="Peihan Liu"
+           onerror="this.onerror=null;this.src='assets/me.svg';" />
+      <div>
+        <h1>Peihan Liu</h1>
+        <p class="tagline">
+          CS PhD student, Columbia ·
+          <a href="mailto:peihanliu@cs.columbia.edu">peihanliu@cs.columbia.edu</a> ·
+          <a href="https://scholar.google.com/citations?user=6rFSRd4AAAAJ">Scholar</a> 
+          <!-- · <a href="https://www.linkedin.com/in/ph-liu/">LinkedIn</a> -->
+        </p>
+      </div>
+    </header>
+
+    <section id="bio">
+      <p>
+        I'm a second-year CS PhD student in the
+        <a href="https://theory.cs.columbia.edu/">Columbia theory group</a>,
+        advised by Rachel Cummings and Roxana Geambasu. I work on
+        <strong>trustworthy machine learning</strong> — particularly the theoretical and empirical foundations of privacy, fairness, and modern machine learning.
+      </p>
+      <p>
+        Previously, I received my M.Eng. in CSE from Harvard, where I worked on
+        algorithmic fairness with Cynthia Dwork and Juan Perdomo. Before that, I earned
+        B.S. degrees in Mathematics and Statistics, with high honors and high
+        distinction, from the University of Michigan, where I worked with
+        Martin Strauss, Ranjan Pal, Shizhang Li, and Nuh Aydin on
+        algorithmic fairness, simplicial algebra, and algebraic coding theory.
+      </p>
+      <p>
+        Beyond research, I walk my <a href="dog.html">dog</a> and (used to) play poker.
+      </p>
+    </section>
+
+    <section id="experience">
+      <h2>Experience</h2>
+      <ul class="entries">
+        <li>
+          <span class="when">Fall 2025</span>
+          <div>
+            Student Researcher, Google<br />
+            <span class="advisor">hosted by Alex Bie and Lily Tsai</span>
+          </div>
+        </li>
+        <li>
+          <span class="when">Summer 2025</span>
+          <div>
+            Student Researcher, Google<br />
+            <span class="advisor">hosted by Alex Bie and Lily Tsai</span>
+          </div>
+        </li>
+        <li>
+          <span class="when">Summer 2023</span>
+          <div>
+            Student Intern, OpenDP<br />
+            <span class="advisor">supervised by Salil Vadhan and Wanrong Zhang</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section id="publications">
+      <h2>Publications</h2>
+      <p class="hint">
+        See <a href="https://scholar.google.com/citations?user=6rFSRd4AAAAJ">Google Scholar</a>
+        for the up-to-date list.
+      </p>
+      <ol class="pubs">
+        <li>
+          <strong>ContinuousBench: Can Differentially Private Synthetic Text Improve Capabilities?</strong><br />
+          <u>Peihan Liu</u>, Lucas Rosenblatt, Weiwei Kong, Natalia Ponomareva, Gautam Kamath, Rachel Cummings, Roxana Geambasu, Yu Gan, Lillian Tsai, Alex Bie<br />
+          <em>preprint</em>, 2026.
+          [<a href="#">arXiv</a>] [<a href="https://github.com/plau666/ContinuousBenchEval">code</a>] [<a href="https://huggingface.co/ContinuousBench">dataset</a>]
+        </li>
+        <li>
+          <strong>Behavior Cloning is Not All You Need: The Optimality of On-Policy Distillation for Noisy Expert Feedback</strong><br />
+          Ved Sriraman, <u>Peihan Liu</u>, Daniel Hsu, Adam Block<br />
+          <em>preprint</em>, 2026.
+          [<a href="#">arXiv</a>] [<a href="#">code</a>]
+        </li>
+        <li>
+          <strong>Adaptive Target-Charging with Privacy Filters and Individual Accounting</strong><br />
+          <u>Peihan Liu</u>, Alison Caulfield, Mark Chen, Rachel Cummings, Roxana Geambasu, Mathias Lécuyer, Pierre Tholoniat<br />
+          <em>preprint</em>, 2026.
+          [<a href="#">arXiv</a>] [<a href="#">code</a>]
+        </li>
+        <li>
+          <strong>Privately Fine-Tuned LLMs Preserve Temporal Dynamics in Tabular Data</strong><br />
+          Lucas Rosenblatt, <u>Peihan Liu</u>, Ryan McKenna, Natalia Ponomareva<br />
+          <em>ICML</em>, 2026.
+          [<a href="https://arxiv.org/pdf/2602.02766">arXiv</a>]
+        </li>
+        <li>
+          <strong>Convex Relaxation for Solving Large-Margin Classifiers in Hyperbolic Space</strong><br />
+          Sheng Yang, <u>Peihan Liu</u>, Cengiz Pehlevan<br />
+          <em>TMLR</em>, 2024.
+          [<a href="https://arxiv.org/abs/2405.17198">arXiv</a>]
+        </li>
+        <li>
+          <strong>Safeguarding Data in Multimodal AI: A Differentially Private Approach to CLIP Training</strong><br />
+          Alyssa Huang, <u>Peihan Liu</u>, Ryumei Nakada, Linjun Zhang, Wanrong Zhang<br />
+          <em>preprint</em>, 2024.
+          [<a href="https://arxiv.org/pdf/2306.08173">arXiv</a>]
+        </li>
+      </ol>
+    </section>
+
+    <section id="blog">
+      <h2>Blog</h2>
+      <ul class="posts">
+        <li>
+          <span class="when">2026-05-14</span>
+          <div>
+            <strong>Release of ContinuousBench</strong><br />
+            Does DP synthetic text actually transfer knowledge? A new benchmark says no — even at ε = 100.
+            <a href="posts/2026-05-14-CB.html">Read &rarr;</a>
+          </div>
+        </li>
+        <!-- <li>
+          <span class="when">Coming soon</span>
+          <div>
+            <strong>Placeholder — a draft post title.</strong><br />
+            One-line summary of what the post is about.
+          </div>
+        </li> -->
+      </ul>
+    </section>
+
+    <footer>
+      <p>
+        &copy; <span id="year">2026</span> Peihan Liu ·
+        Last updated <time datetime="2026-05-15">May 2026</time>
+      </p>
+    </footer>
+
+  </main>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
