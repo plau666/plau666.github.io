@@ -38,6 +38,7 @@
       border-radius: 0 4px 4px 0;
     }
     .tldr p { margin: 0; }
+    .tldr p + p { margin-top: 0.8em; }
     .tldr strong {
       color: var(--fg);
       font-weight: 700;
@@ -47,7 +48,10 @@
       text-underline-offset: 3px;
     }
 
-    .release {
+    .byline-meta { margin-top: 0.6em; }
+    .byline-meta .byline-sep { color: var(--rule); margin: 0 0.25em; }
+
+        .release {
       border-left: 3px solid var(--accent);
       background: var(--accent-soft);
       padding: 0.6em 1em;
@@ -182,7 +186,233 @@
 
     article code { background: var(--code-bg); padding: 0.05em 0.3em; border-radius: 3px; font-size: 0.9em; }
 
-    .sidenote {
+    .sidenote pre {
+      background: var(--code-bg);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 0.7em 0.9em;
+      margin: 0.55em 0 0 0;
+      font-size: 0.82em;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--fg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .preview {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 1em;
+      row-gap: 0.25em;
+      margin: 0.55em 0 0;
+      padding: 0.7em 0.9em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.82em;
+      line-height: 1.5;
+      background: var(--code-bg);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+    }
+    .preview dt {
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0.01em;
+      align-self: baseline;
+    }
+    .preview dt::after { content: ":"; }
+    .preview dd { margin: 0; color: var(--fg); align-self: baseline; }
+    .preview .muted { color: var(--muted); }
+    .preview + .preview { margin-top: 0.4em; }
+    .preview-more {
+      margin: 0.5em 0 0;
+      padding: 0 0.9em;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.82em;
+      text-align: center;
+    }
+
+    details.example { margin: 0.55em 0 0; }
+    details.example > summary {
+      cursor: pointer;
+      color: var(--accent);
+      font-size: 0.92em;
+      list-style: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      user-select: none;
+    }
+    details.example > summary::-webkit-details-marker { display: none; }
+    details.example > summary::before {
+      content: "▸";
+      font-size: 0.85em;
+      transition: transform 0.15s ease;
+    }
+    details.example[open] > summary::before { transform: rotate(90deg); }
+    details.example[open] > .preview { margin-top: 0.5em; }
+
+    .inline-expand {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+    .inline-expand:hover { text-decoration-thickness: 2px; }
+    .inline-expand[aria-expanded="true"]::after { content: " (hide)"; color: var(--muted); }
+    .expandable[hidden] { display: none; }
+    .expandable {
+      margin: 0.9em 0 1.4em;
+      padding: 0.2em 0 0.2em 1em;
+      border-left: 3px solid var(--accent);
+    }
+    .expandable > p:first-of-type { margin-top: 0; }
+    .expandable > :last-child { margin-bottom: 0; }
+    .expandable-label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.4em;
+    }
+
+        .wrong {
+      background: rgba(220, 38, 38, 0.18);
+      border-radius: 2px;
+      padding: 0 0.15em;
+      cursor: help;
+      position: relative;
+    }
+    .wrong:hover::after,
+    .wrong:focus::after {
+      content: attr(title);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: 240px;
+      background: var(--fg);
+      color: var(--bg);
+      padding: 0.4em 0.65em;
+      border-radius: 4px;
+      font: 400 0.82em/1.35 -apple-system, system-ui, sans-serif;
+      font-style: normal;
+      white-space: normal;
+      text-align: left;
+      z-index: 20;
+      pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    }
+    @media (prefers-color-scheme: dark) {
+      .preview {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 1em;
+      row-gap: 0.25em;
+      margin: 0.55em 0 0;
+      padding: 0.7em 0.9em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.82em;
+      line-height: 1.5;
+      background: var(--code-bg);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+    }
+    .preview dt {
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0.01em;
+      align-self: baseline;
+    }
+    .preview dt::after { content: ":"; }
+    .preview dd { margin: 0; color: var(--fg); align-self: baseline; }
+    .preview .muted { color: var(--muted); }
+    .preview + .preview { margin-top: 0.4em; }
+    .preview-more {
+      margin: 0.5em 0 0;
+      padding: 0 0.9em;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.82em;
+      text-align: center;
+    }
+
+    details.example { margin: 0.55em 0 0; }
+    details.example > summary {
+      cursor: pointer;
+      color: var(--accent);
+      font-size: 0.92em;
+      list-style: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4em;
+      user-select: none;
+    }
+    details.example > summary::-webkit-details-marker { display: none; }
+    details.example > summary::before {
+      content: "▸";
+      font-size: 0.85em;
+      transition: transform 0.15s ease;
+    }
+    details.example[open] > summary::before { transform: rotate(90deg); }
+    details.example[open] > .preview { margin-top: 0.5em; }
+
+    .inline-expand {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: var(--accent);
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+    }
+    .inline-expand:hover { text-decoration-thickness: 2px; }
+    .inline-expand[aria-expanded="true"]::after { content: " (hide)"; color: var(--muted); }
+    .expandable[hidden] { display: none; }
+    .expandable {
+      margin: 0.9em 0 1.4em;
+      padding: 0.2em 0 0.2em 1em;
+      border-left: 3px solid var(--accent);
+    }
+    .expandable > p:first-of-type { margin-top: 0; }
+    .expandable > :last-child { margin-bottom: 0; }
+    .expandable-label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.4em;
+    }
+
+        .wrong { background: rgba(248, 113, 113, 0.25); }
+        .x     { color: #f87171; }
+        .check { color: #34d399; }
+    }
+
+    .x, .check {
+      font-weight: 700;
+      font-size: 0.95em;
+      padding: 0 0.05em;
+    }
+    .x     { color: #dc2626; }
+    .check { color: #059669; }
+
+        .sidenote {
       font-size: 0.88em;
       color: var(--muted);
       border-left: 2px solid var(--accent-soft);
@@ -221,12 +451,18 @@
     <p><a href="../index.html">&larr; back</a></p>
     <article>
       <h1>ContinuousBench: does DP synthetic text actually transfer knowledge?</h1>
-      <p class="tagline"><time datetime="2026-05-15">May 15, 2026</time></p>
-      <p class="tagline">
-        <em>Co-led with <a href="https://alexbie98.github.io/">Alex Bie</a>.</em>
+      <p class="tagline byline-meta">
+        <time datetime="2026-05-15">June 1, 2026</time>
+        <span class="byline-sep">·</span>
+        <a href="#"><strong>paper</strong></a>
+        <span class="byline-sep">·</span>
+        <a href="https://huggingface.co/ContinuousBench"><strong>dataset</strong></a>
+        <span class="byline-sep">·</span>
+        <a href="https://github.com/plau666/ContinuousBenchEval"><strong>eval harness</strong></a>
       </p>
       <p class="tagline">
-        <em>Joint work with
+        <em>Co-led by Peihan Liu and <a href="https://alexbie98.github.io/">Alex Bie</a>;
+          joint work with
           <a href="https://lucasrosenblatt.com/">Lucas Rosenblatt</a>,
           <a href="https://wwkong.github.io/">Weiwei Kong</a>,
           <a href="https://scholar.google.com/citations?user=eIdQR5oAAAAJ&hl=en">Natalia Ponomareva</a>,
@@ -239,19 +475,25 @@
 
       <div class="tldr">
         <p>
-          <strong>TL;DR.</strong> We built <em>ContinuousBench</em>, a benchmark that measures
-          <strong>whether differentially private (DP) synthetic text retains the corpus-specific knowledge</strong>
-          that motivated using a sensitive dataset in the first place. On standard benchmarks like
-          <a href="https://huggingface.co/datasets/stanfordnlp/imdb">IMDB</a>
-          and <a href="https://github.com/AI-secure/aug-pe/tree/main/data/openreview">OpenReview</a>, No-training and train-on real only has tiny gap,
-          , and there is no room left to distinguish DP synthesis method. On ContinuousBench, training on the real corpus jumps a
-          Gemma 3 4B model from ~1% to ~97% on the Geminon track and from ~14% to ~70% on the News
-          track. SOTA DP synthesis barely closes that gap — <strong>even at ε = 100</strong>. We
-          release the <a href="https://huggingface.co/ContinuousBench">Corpus, QA</a>, and <a href="https://github.com/plau666/ContinuousBenchEval">eval harness</a>.
+          <strong>TL;DR.</strong> We built <em>ContinuousBench</em>, a benchmark for
+          <strong>whether DP synthetic text retains the corpus-specific knowledge</strong>
+          that motivated using a sensitive dataset in the first place. Existing benchmarks
+          like <a href="https://huggingface.co/datasets/stanfordnlp/imdb">IMDB</a> and
+          <a href="https://github.com/AI-secure/aug-pe/tree/main/data/openreview">OpenReview</a>
+          are saturated — train-on-real beats no-training by only a few points
+          (51% → 62% on IMDB, 94% → 97% on OpenReview),
+          leaving no room to distinguish DP synthesis methods.
+        </p>
+        <p>
+          On ContinuousBench, training on the real corpus jumps a Gemma 3 4B model from
+          <strong>~1% → ~97%</strong> on Geminon and from
+          <strong>~14% → ~70%</strong> on News. Yet with differential privacy, even at <strong>ε = 100</strong>,
+          SOTA DP synthesis only reaches <strong>~4%</strong> on Geminon and
+          <strong>~26%</strong> on News — far below train-on-real.
         </p>
       </div>
 
-      <h2>What's wrong with current evaluations</h2>
+      <h2>What's wrong with current evaluations for DP synthetic text?</h2>
 
       <div class="aside-anchor">
         <p>
@@ -279,14 +521,16 @@
           mean the synthetic data taught it anything new.
         </li>
         <li>
-          <strong>The metrics reward style, not knowledge.</strong> MAUVE, BLEU, next-token acc., etc. can all improve when the text sounds right. 
+          <strong>The metrics reward style, not knowledge.</strong> MAUVE, BLEU, classification accuracy, etc. can all improve when the synthetic text only gets the right "vibe".
           A DP synthetic copy can score
           well on these metrics while losing the specific facts in the source corpus, so good metric scores
           do not necessarily mean real information transfer.
         </li>
-        <strong>Teacher–student distillation muddies the signal.</strong> Synthetic data is often generated
+        <li>
+          <strong>Teacher–student distillation muddies the signal.</strong> Synthetic data is often generated
           by a stronger model and then used to train a weaker model for eval. The gains may come from the
           stronger model teaching the weaker one, rather than from knowledge learned from the private corpus.
+        </li>
       </ol>
 
       <p>
@@ -384,9 +628,13 @@
 
       <ul>
         <li>
-          <strong>Freshness.</strong> The corpus is constructed to be unseen by the models before the
+          <strong>Freshness.</strong> 
+          <!-- The corpus is constructed to be unseen by the models before the
           release date: either procedurally generated fictional facts in <em>Geminon</em>, a
           Pokémon-inspired invented world, or post-cutoff news in <em>News</em>, built from CC-News.
+          The QA set tests knowledge from that corpus. -->
+          The corpus is constructed to be unseen by the tested model. In Geminon, we procedurally generate a Pokémon-inspired fictional world, and generate articles from it with Gemini. 
+          In News, we source news articles after the training cutoff from periodically released <a href="https://data.commoncrawl.org/crawl-data/CC-NEWS/index.html">CommonCrawl-News</a> dumps. 
           The QA set tests knowledge from that corpus.
         </li>
         <li>
@@ -410,19 +658,19 @@
 
       <div class="tabs" data-tabs>
         <div role="tablist" class="tab-bar" aria-label="Pipeline track">
-          <button role="tab" id="tab-geminon" aria-selected="true"
-                  aria-controls="panel-geminon" class="tab-btn">Geminon</button>
-          <button role="tab" id="tab-news" aria-selected="false"
-                  aria-controls="panel-news" class="tab-btn" tabindex="-1">News</button>
+          <button role="tab" id="tab-geminon" aria-selected="false"
+                  aria-controls="panel-geminon" class="tab-btn" tabindex="-1">Geminon</button>
+          <button role="tab" id="tab-news" aria-selected="true"
+                  aria-controls="panel-news" class="tab-btn">News</button>
         </div>
 
-        <div role="tabpanel" id="panel-geminon" aria-labelledby="tab-geminon" class="tab-panel">
+        <div role="tabpanel" id="panel-geminon" aria-labelledby="tab-geminon" class="tab-panel" hidden>
           <div class="pipeline">
             <div class="step">
               <span class="step-label">
                 Index entry <span class="step-note">structured source fact</span>
               </span>
-              <pre><code>
+              <!-- Original JSON version (kept for future):
                 {
                   "name": "Boreling",
                   "classification": "Frost Geminon",
@@ -445,7 +693,17 @@
                     "short_description": "Has a chance to freeze the target."
                   }
                 }
-              </code></pre>
+              -->
+              <dl class="preview">
+                <dt>name</dt>          <dd>Boreling</dd>
+                <dt>classification</dt><dd>Frost Geminon</dd>
+                <dt>type</dt>          <dd>ice</dd>
+                <dt>ability</dt>       <dd>Berserk</dd>
+                <dt>stats</dt>         <dd>HP 69 / Atk 60 / Def 63 / SpA 67 / SpD 68 / Spe 40 / BST 367</dd>
+                <dt>size</dt>          <dd>12 m, 52 lbs</dd>
+                <dt>evolution</dt>     <dd>Boreling → Borelash → Borastat</dd>
+                <dt>move</dt>          <dd>Powder Snow - Has a chance to freeze the target</dd>
+              </dl>
               <aside class="sidenote">
                 <span class="sidenote-label">How the index is built</span>
                 All numerical stats are sampled from our pre-specified distributions; categorical
@@ -460,37 +718,24 @@
               <span class="step-label">
                 Training article <span class="step-note">tagged with mentioned attributes</span>
               </span>
-              <pre><code>
+              <!-- Original JSON version (kept for future):
                 {
                   "text": "Boreling is an ice-type Geminon, also known as the Frost Geminon, and it is the first form of a three-stage evolution line that includes Borelash and Borastat. Physically, it is 12 meters tall and weighs 52 lbs. Boreling has a base stat total of 367, with its individual stats being 69 HP, 60 attack, 63 defense, 67 special attack, 68 special defense, and 40 speed. Its ability is Berserk, and it can learn the move Powder Snow, which has a chance to inflict the frozen status on an opponent.",
                   "tag": [
                     {
                       "idx": 10003,
-                      "info": [
-                        "idx",
-                        "name",
-                        "classification",
-                        "type1",
-                        "ability",
-                        "evolution_line",
-                        "height",
-                        "weight",
-                        "base_stat_total",
-                        "hp",
-                        "attack",
-                        "defense",
-                        "special attack",
-                        "special defense",
-                        "speed",
-                        "move.name",
-                        "move.short_description"
-                      ]
+                      "info": ["idx","name","classification","type1","ability","evolution_line","height","weight","base_stat_total","hp","attack","defense","special attack","special defense","speed","move.name","move.short_description"]
                     }
                   ],
                   "type": "wiki",
                   "article_idx": 1328056
                 }
-              </code></pre>
+              -->
+              <dl class="preview">
+                <dt>text</dt><dd>Boreling is an ice-type Geminon, also known as the Frost Geminon, and it is the first form of a three-stage evolution line that includes Borelash and Borastat. Physically, it is 12 meters tall and weighs 52 lbs. Boreling has a base stat total of 367, with its individual stats being 69 HP, 60 attack, 63 defense, 67 special attack, 68 special defense, and 40 speed. Its ability is Berserk, and it can learn the move Powder Snow, which has a chance to inflict the frozen status on an opponent.</dd>
+                <dt>type</dt><dd>wiki</dd>
+                <dt>tag</dt><dd>name, classification, type, ability, all six stats, evolution_line, size, move</dd>
+              </dl>
               <aside class="sidenote">
                 <span class="sidenote-label">How records are generated</span>
                 We prompt Gemini to write articles based on index entries, in several
@@ -507,37 +752,48 @@
               <span class="step-label">
                 QA pair <span class="step-note">with support article ids</span>
               </span>
-              <pre><code>
+              <!-- Original JSON version (kept for future):
                 {
                   "question": "What is the classification of Boreling?",
                   "answer":   "Frost Geminon",
-                  "supports": [7410, 8929, 10420, ...]   # articles that support this answer
+                  "supports": [7410, 8929, 10420, ...]
                 },
                 {
                   "question": "What are the types of Boreling?",
                   "answer":   "Ice",
-                  "supports": [3, 1515, 5964, ...]   # articles that support this answer
+                  "supports": [3, 1515, 5964, ...]
                 },
                 ...
-              </code></pre>
-              <aside class="sidenote">
+              -->
+              <dl class="preview">
+                <dt>Q</dt><dd>What is the classification of Boreling?</dd>
+                <dt>A</dt><dd>Frost Geminon</dd>
+                <dt>supports</dt><dd>7410, 8929, 10420, … <span class="muted"># articles that support this answer</span> </dd>
+              </dl>
+              <dl class="preview">
+                <dt>Q</dt><dd>What are the types of Boreling?</dd>
+                <dt>A</dt><dd>Ice</dd>
+                <dt>supports</dt><dd>3, 1515, 5964, … <span class="muted"># articles that support this answer</span></dd>
+              </dl>
+              <div class="preview-more">…</div>
+              <!-- <aside class="sidenote">
                 <span class="sidenote-label">Two QA splits</span>
                 Each QA asks about an attribute of a Geminon and records the IDs of the
                 supporting articles. There are two splits: a <strong>high-repetition</strong> set
                 with support size roughly ≥ 200, and a <strong>singleton</strong> set with support
                 size = 1.
-              </aside>
+              </aside> -->
             </div>
           </div>
         </div>
 
-        <div role="tabpanel" id="panel-news" aria-labelledby="tab-news" class="tab-panel" hidden>
+        <div role="tabpanel" id="panel-news" aria-labelledby="tab-news" class="tab-panel">
           <div class="pipeline">
             <div class="step">
               <span class="step-label">
                 Source article <span class="step-note">collected post-cutoff news from <a href="https://data.commoncrawl.org/crawl-data/CC-NEWS/index.html">CC-News</a> + dedup</span>
               </span>
-              <pre><code>
+              <!-- Original JSON version (kept for future):
                 {
                   "url": "https://www.hindustantimes.com/cricket/pakistan-knock-on-iccs-door-...",
                   "hostname": "www.hindustantimes.com",
@@ -547,7 +803,13 @@
                   "language": "en",
                   "text": "Pakistan knocks on ICC's door, demands immediate removal of match referee for staying silent on India's no handshake. The PCB has escalated India's no-handshake controversy to the ICC, asking for the immediate removal of match referee Andy Pycroft..."
                 }
-              </code></pre>
+              -->
+              <dl class="preview">
+                <dt>url</dt><dd><a href="https://www.hindustantimes.com/cricket/pakistan-knock-on-iccs-door-101757928011929.html">hindustantimes.com/cricket/pakistan-knock-on-iccs-door-…</a></dd>
+                <dt>date</dt><dd>2025-09-15</dd>
+                <dt>title</dt><dd>Pakistan knocks on ICC's door, demands immediate removal of match referee…</dd>
+                <dt>text</dt><dd>Pakistan knocks on ICC's door, demands immediate removal of match referee for staying silent on India's no handshake. The PCB has escalated India's no-handshake controversy to the ICC, asking for the immediate removal of match referee Andy Pycroft…</dd>
+              </dl>
             </div>
 
             <div class="step-arrow">↓ <span>cluster, generate QA, then verify support with open-book retrieval</span></div>
@@ -556,7 +818,7 @@
               <span class="step-label">
                 QA pair <span class="step-note">with closed- and open-book baselines</span>
               </span>
-              <pre><code>
+              <!-- Original JSON version (kept for future):
                 {
                   "question": "Who was the match referee for the India vs. Pakistan Asia Cup match on September 14, 2025?",
                   "answer": "Andy Pycroft",
@@ -571,7 +833,19 @@
                     { "article_id": 1713242, "answer": "Not mentioned", "is_correct": false }
                   ]
                 }
-              </code></pre>
+              -->
+              <dl class="preview">
+                <dt>question</dt><dd>Who was the match referee for the India vs. Pakistan Asia Cup match on September 14, 2025?</dd>
+                <dt>answer</dt><dd>Andy Pycroft</dd>
+                <dt>support_count</dt><dd>648</dd>
+                <dt>closedbook</dt><dd>Javagal Srinath  <span class="x">✘</span>  <span class="muted"># zeroshot Gemini</span></dd>
+                <dt>openbook</dt>
+                <dd>
+                  <div>"Not mentioned"  <span class="x">✘</span>  <span class="muted"># Gemini with context of articles 126152</span></div>
+                  <div class="muted">…</div>
+                  <div>"Andy Pycroft"   <span class="check">✓</span>  <span class="muted"># Gemini with context of articles 747116</span></div>
+                </dd>
+              </dl>
               <aside class="sidenote">
                 <span class="sidenote-label">How News QA is built</span>
                 <strong>Cluster + extract.</strong> Cluster the deduped articles and keep the top 500 largest clusters. Per
@@ -602,11 +876,16 @@
       <h2>The gap under differential privacy</h2>
 
       <p>
-        The main result is simple: <strong/> synthesis works, while DP synthesis mostly does not.</strong>
+        The main result is simple: <strong> synthesis works, while DP synthesis mostly does not.</strong>
         In the standard “fine-tune then sample” pipeline, public synthetic data (ε = ∞) nearly matches the real
-        corpus: 93% vs. 96% on Geminon, and 66% vs. 70% on News. With DP fine-tuning, accuracy drops
-        sharply: 14% / 21% at ε = 100, and barely above no-training at ε = 10. 
-        Another promising training-free DP method, <a href="https://arxiv.org/pdf/2403.01749">Private Evolution</a>, does not close the gap either: it falls <em>below</em> no-training on both Geminon and News.
+        corpus.
+        <!-- : 93% vs. 96% on Geminon, and 66% vs. 70% on News.  -->
+        With DP, accuracy collapses: on Geminon, DP synthesis reaches only <strong>4%</strong>
+        at <strong>ε = 100</strong> and <strong>3%</strong> at <strong>ε = 10</strong>.
+        On News, it reaches <strong>26%</strong> at <strong>ε = 100</strong>
+        and <strong>20%</strong> at <strong>ε = 10</strong> — barely above no-training in both cases. 
+        Another promising training-free DP method, <a href="https://arxiv.org/pdf/2403.01749">Private Evolution</a>, does not close the gap either: 
+        it <strong>falls below no-training</strong> on both Geminon and News.
       </p>
 
       <figure>
@@ -634,19 +913,19 @@
 
           <!-- Group 2: DP-Syn ε=10 -->
           <g>
-            <rect x="211" y="251.1" width="38" height="8.9"  class="gem-3"/>
-            <rect x="255" y="246.7" width="38" height="13.3" class="news-3"/>
-            <text x="230" y="247" class="vl">4</text>
-            <text x="274" y="242" class="vl">6</text>
+            <rect x="211" y="253.1" width="38" height="6.9"  class="gem-3"/>
+            <rect x="255" y="214"   width="38" height="46"  class="news-3"/>
+            <text x="230" y="249" class="vl">3</text>
+            <text x="274" y="210" class="vl">20</text>
             <text x="252" y="278" class="xl">DP-Syn ε=10</text>
           </g>
 
           <!-- Group 3: DP-Syn ε=100 -->
           <g>
-            <rect x="339" y="228.5" width="38" height="31.5" class="gem-3"/>
-            <rect x="383" y="212.7" width="38" height="47.3" class="news-3"/>
-            <text x="358" y="224" class="vl">14</text>
-            <text x="402" y="208" class="vl">21</text>
+            <rect x="339" y="250.8" width="38" height="9.2"  class="gem-3"/>
+            <rect x="383" y="200.2" width="38" height="59.8" class="news-3"/>
+            <text x="358" y="247" class="vl">4</text>
+            <text x="402" y="196" class="vl">26</text>
             <text x="380" y="278" class="xl">DP-Syn ε=100</text>
           </g>
 
@@ -687,9 +966,27 @@
         The pattern is clear: today's DP synthetic text can preserve the <em>form</em> of a corpus —
         its style, topics, and document structure — while losing the factual content that makes the data
         valuable. On Geminon, for example, going from ε = ∞ to ε = 10 only drops MAUVE by 0.10, but drops
-        QA accuracy by 88.6 points. If a method cannot recover facts repeated across hundreds of
-        independent records, it has not really preserved the corpus :(
+        QA accuracy by 88.6 points.
+        <button type="button" class="inline-expand"
+                aria-controls="failure-mode-block" aria-expanded="false">See example</button>.
+        If a method cannot recover facts repeated across hundreds of independent records,
+        it has not really preserved the corpus :(
       </p>
+
+      <div id="failure-mode-block" class="expandable" hidden>
+        <span class="expandable-label">Failure mode on Geminon</span>
+        <p>
+          DP-synth Geminon entries read like the real corpus at a glance, but on closer
+          inspection most attributes contradict the index. One DP synthetic record for
+          <em>Boreling</em>:
+        </p>
+        <!-- Original JSON wrapper (kept for future):
+             { "text": "With a base stat total of 344, Boreling has..." }
+        -->
+        <dl class="preview">
+          <dt>DP text</dt><dd>With a base stat total of <span class="wrong" title="real: 367">344</span>, <strong>Boreling</strong> has an incredibly high special defense of <span class="wrong" title="real: 68">87</span> and an above-average HP of <span class="wrong" title="real: 69">68</span>. However, its physical stats, including a speed of <span class="wrong" title="real: 40">12</span>, are quite low. This small, light creature (<span class="wrong" title="real: 12 m">19 m</span>, <span class="wrong" title="real: 52 lbs">78 lbs</span>) has the <span class="wrong" title="real: Frost Geminon">Dragon Geminon</span> classification and is known as <strong>Boreling</strong>. Its other stats include an attack of <span class="wrong" title="real: 60">33</span>, a special attack of <span class="wrong" title="real: 67">49</span>, and a defense of <span class="wrong" title="real: 63">41</span>. <strong>Boreling</strong> is a <span class="wrong" title="real: pure ice-type">pure dragon-type</span> and knows the move <span class="wrong" title="real: Powder Snow">Dragon Rage</span>, which <span class="wrong" title="real: has a chance to freeze the target">inflicts regular damage with no additional effects</span>.</dd>
+        </dl>
+      </div>
 
       <div class="release">
         <p>
@@ -710,6 +1007,18 @@
       const indents = text.split('\n').filter(l => l.trim()).map(l => l.match(/^[ \t]*/)[0].length);
       const min = indents.length ? Math.min(...indents) : 0;
       code.textContent = text.split('\n').map(l => l.slice(min)).join('\n');
+    });
+
+    // Inline expandable triggers: <button class="inline-expand" aria-controls="...">
+    document.querySelectorAll('.inline-expand').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.getAttribute('aria-controls'));
+        if (!target) return;
+        const open = target.hidden;
+        target.hidden = !open;
+        btn.setAttribute('aria-expanded', open);
+        btn.textContent = open ? 'Hide example' : 'See example';
+      });
     });
 
     // Tab switching (Geminon / News pipelines)
