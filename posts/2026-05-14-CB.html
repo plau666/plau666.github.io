@@ -9,14 +9,18 @@
     :root {
       --code-bg: #f5f6f7;
       /* benchmark color encodes track; shade encodes training regime */
-      --gem-1:  #b9d9eb;  --gem-2:  #6cace4;  --gem-3:  #1e4f8b;
+      /* old Columbia-blue Geminon palette: */
+      /* --gem-1: #b9d9eb;  --gem-2: #6cace4;  --gem-3: #1e4f8b; */
+      --gem-1:  #99f6e4;  --gem-2:  #2dd4bf;  --gem-3:  #0d9488;
       --news-1: #fde68a;  --news-2: #f59e0b;  --news-3: #b45309;
       --gray-1: #cbd5e1;  --gray-2: #94a3b8;  --gray-3: #475569;
     }
     @media (prefers-color-scheme: dark) {
       :root {
         --code-bg: #1c1c1b;
-        --gem-1:  #1e4f8b;  --gem-2:  #6cace4;  --gem-3:  #9bcbeb;
+        /* old Columbia-blue Geminon palette: */
+        /* --gem-1: #1e4f8b;  --gem-2: #6cace4;  --gem-3: #9bcbeb; */
+        --gem-1:  #0d9488;  --gem-2:  #2dd4bf;  --gem-3:  #5eead4;
         --news-1: #78350f;  --news-2: #d97706;  --news-3: #fbbf24;
         --gray-1: #475569;  --gray-2: #94a3b8;  --gray-3: #cbd5e1;
       }
@@ -35,6 +39,23 @@
     }
     .tldr p { margin: 0; }
     .tldr strong {
+      color: var(--fg);
+      font-weight: 700;
+      text-decoration: underline;
+      text-decoration-color: var(--accent);
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .release {
+      border-left: 3px solid var(--accent);
+      background: var(--accent-soft);
+      padding: 0.6em 1em;
+      margin: 2em 0 1.6em;
+      border-radius: 0 4px 4px 0;
+    }
+    .release p { margin: 0; }
+    .release strong {
       color: var(--fg);
       font-weight: 700;
       text-decoration: underline;
@@ -122,11 +143,23 @@
       color: var(--news-3);
       border-bottom-color: var(--news-3);
     }
+    #tab-geminon[aria-selected="true"] {
+      color: var(--gem-3);
+      border-bottom-color: var(--gem-3);
+    }
     .tab-panel[hidden] { display: none; }
 
     /* News panel uses amber accents to match its tab */
     #panel-news .step-label,
-    #panel-news .step-arrow { color: var(--news-3); }
+    #panel-news .step-arrow,
+    #panel-news .sidenote-label { color: var(--news-3); }
+    #panel-news .sidenote { border-left-color: var(--news-1); }
+
+    /* Geminon panel uses teal accents to match its tab + chart */
+    #panel-geminon .step-label,
+    #panel-geminon .step-arrow,
+    #panel-geminon .sidenote-label { color: var(--gem-3); }
+    #panel-geminon .sidenote { border-left-color: var(--gem-1); }
 
     /* SVG chart styles — theme-aware */
     .chart .grid { stroke: var(--rule); stroke-width: 1; }
@@ -148,6 +181,39 @@
     .chart .gray-3 { fill: var(--gray-3); }
 
     article code { background: var(--code-bg); padding: 0.05em 0.3em; border-radius: 3px; font-size: 0.9em; }
+
+    .sidenote {
+      font-size: 0.88em;
+      color: var(--muted);
+      border-left: 2px solid var(--accent-soft);
+      padding: 0.4em 0 0.4em 1em;
+      margin: 1em 0 1.4em;
+    }
+    .sidenote-label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.3em;
+    }
+    .aside-anchor { position: relative; }
+    .step { position: relative; }
+
+    /* Wide-viewport: float sidenotes into the right margin (Tufte style) */
+    @media (min-width: 1180px) {
+      .aside-anchor > .sidenote,
+      .step > .sidenote {
+        position: absolute;
+        top: 0;
+        left: 100%;
+        margin: 0 0 0 32px;
+        width: 200px;
+        padding: 0.3em 0 0.3em 0.9em;
+        font-size: 0.82em;
+      }
+    }
   </style>
 </head>
 <body>
@@ -156,49 +222,71 @@
     <article>
       <h1>ContinuousBench: does DP synthetic text actually transfer knowledge?</h1>
       <p class="tagline"><time datetime="2026-05-15">May 15, 2026</time></p>
+      <p class="tagline">
+        <em>Co-led with <a href="https://alexbie98.github.io/">Alex Bie</a>.</em>
+      </p>
+      <p class="tagline">
+        <em>Joint work with
+          <a href="https://lucasrosenblatt.com/">Lucas Rosenblatt</a>,
+          <a href="https://wwkong.github.io/">Weiwei Kong</a>,
+          <a href="https://scholar.google.com/citations?user=eIdQR5oAAAAJ&hl=en">Natalia Ponomareva</a>,
+          <a href="http://www.gautamkamath.com/">Gautam Kamath</a>,
+          <a href="https://rachelcummings.com/">Rachel Cummings</a>,
+          <a href="https://roxanageambasu.github.io/">Roxana Geambasu</a>,
+          <a href="https://ygan397.github.io/">Yu Gan</a>, and
+          <a href="https://tslilyai.github.io/">Lillian Tsai</a>.</em>
+      </p>
 
       <div class="tldr">
         <p>
           <strong>TL;DR.</strong> We built <em>ContinuousBench</em>, a benchmark that measures
-          whether differentially private (DP) synthetic text retains the corpus-specific knowledge
+          <strong>whether differentially private (DP) synthetic text retains the corpus-specific knowledge</strong>
           that motivated using a sensitive dataset in the first place. On standard benchmarks like
-          IMDB sentiment and OpenReview, every method looks roughly the same (mid-90s%) — there is
-          no room left to distinguish them. On ContinuousBench, training on the real corpus jumps a
-          Gemma 3 4B model from ~1% to ~96% on the Geminon track and from ~14% to ~70% on the News
+          <a href="https://huggingface.co/datasets/stanfordnlp/imdb">IMDB</a>
+          and <a href="https://github.com/AI-secure/aug-pe/tree/main/data/openreview">OpenReview</a>, No-training and train-on real only has tiny gap,
+          , and there is no room left to distinguish DP synthesis method. On ContinuousBench, training on the real corpus jumps a
+          Gemma 3 4B model from ~1% to ~97% on the Geminon track and from ~14% to ~70% on the News
           track. SOTA DP synthesis barely closes that gap — <strong>even at ε = 100</strong>. We
-          release a corpus, QA set, and standardized harness, and we regenerate it quarterly to
-          stay contamination-free.
+          release the <a href="https://huggingface.co/ContinuousBench">Corpus, QA</a>, and <a href="https://github.com/plau666/ContinuousBenchEval">eval harness</a>.
         </p>
       </div>
 
       <h2>What's wrong with current evaluations</h2>
 
-      <p>
-        DP text synthesis promises a way to learn from sensitive corpora — clinical notes, legal
-        records, internal documents — through a privacy-preserving release. But the question that
-        matters isn't <em>"does the output look like the original?"</em> It's: <em>does it transmit
-        the capabilities you would have gotten by training on the real data?</em>
-      </p>
+      <div class="aside-anchor">
+        <p>
+          The pitch for DP text synthesis is simple: take a sensitive corpus, e.g. internal docs, and release synthetic text that others can safely use, for example to train models.
+          But looking similar is not enough. The goal is to <em>preserve the capabilities we would have gained from training on the real data</em>:
+          if the real data would teach a model to answer questions about internal knowledge, the synthetic data should too*.
+        </p>
 
-      <p>Existing evaluations don't answer this, for three reasons:</p>
+        <aside class="sidenote">
+          <span class="sidenote-label">*Concrete example</span>
+          Think of a company releasing DP synthetic versions of its support tickets. It is not
+          enough for the synthetic tickets to sound like support tickets. If the real tickets
+          would teach a model which bugs, products, and fixes go together, the synthetic tickets
+          should teach that too. Current evaluations often miss this distinction.
+        </aside>
+      </div>
+
+      <p>Existing evaluations often miss this for three reasons:</p>
 
       <ol>
         <li>
-          <strong>The knowledge is already in the base model.</strong> IMDB sentiment,
-          classification-style tasks on familiar domains — modern pretrained LLMs already solve
-          these out of the box. Strong downstream numbers don't prove the corpus mattered; they
-          prove pretraining was enough.
+          <strong>The knowledge already in the base model.</strong> On IMDB, Yelp, OpenReview, and other
+          familiar classification-style benchmarks, modern LMs can already solve these out
+          of the box, even at ~1B scale. Hence, if a modern pretrained LM gets good numbers after training on DP synthetic data, that does not necessarily
+          mean the synthetic data taught it anything new.
         </li>
         <li>
-          <strong>The metrics measure style, not knowledge.</strong> MAUVE, BLEU, next-token loss,
-          distributional similarity — all reward stylistic matching. A DP generator can ace these
-          while losing every specific fact in the source corpus.
+          <strong>The metrics reward style, not knowledge.</strong> MAUVE, BLEU, next-token acc., etc. can all improve when the text sounds right. 
+          A DP synthetic copy can score
+          well on these metrics while losing the specific facts in the source corpus, so good metric scores
+          do not necessarily mean real information transfer.
         </li>
-        <li>
-          <strong>Teacher–student distillation contaminates the signal.</strong> Synthetic data is
-          usually generated by a model much stronger than the one trained on it. The downstream
-          gains then conflate corpus signal with ordinary distillation from a more capable teacher.
-        </li>
+        <strong>Teacher–student distillation muddies the signal.</strong> Synthetic data is often generated
+          by a stronger model and then used to train a weaker model for eval. The gains may come from the
+          stronger model teaching the weaker one, rather than from knowledge learned from the private corpus.
       </ol>
 
       <p>
@@ -259,10 +347,10 @@
           <g>
             <rect x="560" y="227.6" width="36" height="32.4" class="news-1"/>
             <rect x="602" y="214.9" width="36" height="45.1" class="news-2"/>
-            <rect x="644" y="113"   width="36" height="147"  class="news-3"/>
+            <rect x="644" y="99"    width="36" height="161"  class="news-3"/>
             <text x="578" y="223" class="vl">14</text>
             <text x="620" y="210" class="vl">20</text>
-            <text x="662" y="109" class="vl">64</text>
+            <text x="662" y="95"  class="vl">70</text>
             <text x="620" y="278" class="xl news-label">News (ours)</text>
           </g>
 
@@ -276,12 +364,14 @@
             <text x="288" y="10" class="lg">Train on real</text>
           </g>
         </svg>
-        <figcaption>
+        <!-- <figcaption>
           Downstream accuracy of Gemma 3 4B after three increasingly informative training regimes.
-          IMDB and OpenReview are saturated (≤ 3 pp gap between &ldquo;no training&rdquo; and
-          &ldquo;real corpus&rdquo;). ContinuousBench has +94 pp on Geminon and +50 pp on News.
-          Hue encodes benchmark (gray = saturated, blue = Geminon, amber = News);
-          shade encodes training regime (light → dark = no training → real corpus).
+          IMDB and OpenReview are saturated (≤ 3 % / 9 % gap respectively between &ldquo;no training&rdquo; and
+          &ldquo;real corpus&rdquo;). ContinuousBench has +94 % on Geminon and +50 % on News.
+        </figcaption> -->
+        <figcaption>
+            Standard benchmarks are nearly saturated: the base model (Gemma 3 4B) is already strong. ContinuousBench
+            creates headroom to measure whether synthetic data transfers new knowledge.
         </figcaption>
       </figure>
 
@@ -289,31 +379,33 @@
 
       <p>
         Each release packages three things: a fresh training corpus, a derived short-answer QA set,
-        and a standardized training/eval harness. Three design choices fall out of the diagnosis
-        above:
+        and a standardized training/eval harness. The benchmark is built around three design goals:
       </p>
 
       <ul>
         <li>
-          <strong>Freshness.</strong> QA tests knowledge unavailable to the base model — either
-          procedurally generated fictional facts (the <em>Geminon</em> track, a Pokémon-inspired
-          invented world) or post-cutoff news (the <em>News</em> track, from CC-News).
+          <strong>Freshness.</strong> The corpus is constructed to be unseen by the models before the
+          release date: either procedurally generated fictional facts in <em>Geminon</em>, a
+          Pokémon-inspired invented world, or post-cutoff news in <em>News</em>, built from CC-News.
+          The QA set tests knowledge from that corpus.
         </li>
         <li>
-          <strong>Grounded QA, not style.</strong> Every question has a normalized short answer
-          scored automatically. No MAUVE-style proxies.
+          <strong>Grounded QA.</strong> Each question is linked to supporting records in the corpus and has
+          a normalized short answer, so evaluation can be automatic and verifiable.
         </li>
         <li>
-          <strong>DP-learnable by construction.</strong> Every test question is supported by ≥200
+          <strong>DP-learnable facts by construction.</strong> Each main test question is supported by at least 200
           independent records, so the target is population-level knowledge rather than singleton
-          memorization. A singleton split is kept as a privacy sanity check.
+          memorization. We also keep a singleton split, where each fact appears in only one record, as a
+          privacy sanity check.
         </li>
       </ul>
 
       <p>
-        To eliminate teacher–student confounds, the harness uses the <em>same</em> base checkpoint
-        for the generator and the downstream model. The two tracks differ in how the corpus is
-        seeded — Geminon from a procedurally generated index, News from CC-News articles:
+        To avoid teacher–student confounds, we use the <em>same</em> base checkpoint for the generator
+        and the downstream evaluator. Geminon gives us a fully controlled fictional domain for studying
+        DP learnability, while News gives us a continuously collected real-world corpus with natural
+        messiness and time-evolving facts.
       </p>
 
       <div class="tabs" data-tabs>
@@ -354,17 +446,23 @@
                   }
                 }
               </code></pre>
+              <aside class="sidenote">
+                <span class="sidenote-label">How the index is built</span>
+                All numerical stats are sampled from our pre-specified distributions; categorical
+                features (types, abilities, moves) are drawn uniformly from the Pokémon vocabulary.
+                Gemini is used to invent the name and classification.
+              </aside>
             </div>
 
-            <div class="step-arrow">↓ <span>rendered into prose for training</span></div>
+            <div class="step-arrow">↓ <span>sample Gemini for training articles grounded in the index, then dedup</span></div>
 
             <div class="step">
               <span class="step-label">
-                Synthesized record <span class="step-note">one of ≥200 paraphrases</span>
+                Training article <span class="step-note">tagged with mentioned attributes</span>
               </span>
               <pre><code>
                 {
-                  "text": "As the first stage in the evolutionary line that culminates in Borastat, Boreling is a quintessential Frost Geminon. This pure ice-type, known as Gemidex entry #10003, measures 12 meters in height and weighs 52 lbs.  Its passive ability is Berserk, and it can be taught the move Powder Snow, which has a percentage-based chance to freeze an opponent. Boreling's base stat total of 367 is comprised of 69 HP, 60 attack, 63 defense, 67 special attack, 68 special defense, and a speed rating of 40.",
+                  "text": "Boreling is an ice-type Geminon, also known as the Frost Geminon, and it is the first form of a three-stage evolution line that includes Borelash and Borastat. Physically, it is 12 meters tall and weighs 52 lbs. Boreling has a base stat total of 367, with its individual stats being 69 HP, 60 attack, 63 defense, 67 special attack, 68 special defense, and 40 speed. Its ability is Berserk, and it can learn the move Powder Snow, which has a chance to inflict the frozen status on an opponent.",
                   "tag": [
                     {
                       "idx": 10003,
@@ -389,28 +487,46 @@
                       ]
                     }
                   ],
-                  "type": "wiki"
+                  "type": "wiki",
+                  "article_idx": 1328056
                 }
               </code></pre>
+              <aside class="sidenote">
+                <span class="sidenote-label">How records are generated</span>
+                We prompt Gemini to write articles based on index entries, in several
+                document types — single-Geminon wiki entries and field journals, head-to-head comparisons of two
+                Geminons, and evolutionary-line analyses. During generation we also record which
+                attributes of each Geminon the article actually mentions (the <code>tag</code>
+                field).
+              </aside>
             </div>
 
-            <div class="step-arrow">↓ <span>derived as short-answer eval</span></div>
+            <div class="step-arrow">↓ <span>each attribute becomes a question</span></div>
 
             <div class="step">
               <span class="step-label">
-                QA pair <span class="step-note">normalized, exact-match scored</span>
+                QA pair <span class="step-note">with support article ids</span>
               </span>
               <pre><code>
                 {
-                  "question": "What is the classification of Boreling?"
-                  "answer": "Frost Geminon"
-                }
+                  "question": "What is the classification of Boreling?",
+                  "answer":   "Frost Geminon",
+                  "supports": [7410, 8929, 10420, ...]   # articles that support this answer
+                },
                 {
-                  "question": "What are the types of Boreling?"
-                  "answer": "Ice"
-                }
+                  "question": "What are the types of Boreling?",
+                  "answer":   "Ice",
+                  "supports": [3, 1515, 5964, ...]   # articles that support this answer
+                },
                 ...
               </code></pre>
+              <aside class="sidenote">
+                <span class="sidenote-label">Two QA splits</span>
+                Each QA asks about an attribute of a Geminon and records the IDs of the
+                supporting articles. There are two splits: a <strong>high-repetition</strong> set
+                with support size roughly ≥ 200, and a <strong>singleton</strong> set with support
+                size = 1.
+              </aside>
             </div>
           </div>
         </div>
@@ -419,7 +535,7 @@
           <div class="pipeline">
             <div class="step">
               <span class="step-label">
-                Source article <span class="step-note">CC-News, post-cutoff</span>
+                Source article <span class="step-note">collected post-cutoff news from <a href="https://data.commoncrawl.org/crawl-data/CC-NEWS/index.html">CC-News</a> + dedup</span>
               </span>
               <pre><code>
                 {
@@ -434,7 +550,7 @@
               </code></pre>
             </div>
 
-            <div class="step-arrow">↓ <span>fact-anchored question across ≥200 supporting articles</span></div>
+            <div class="step-arrow">↓ <span>cluster, generate QA, then verify support with open-book retrieval</span></div>
 
             <div class="step">
               <span class="step-label">
@@ -456,21 +572,41 @@
                   ]
                 }
               </code></pre>
+              <aside class="sidenote">
+                <span class="sidenote-label">How News QA is built</span>
+                <strong>Cluster + extract.</strong> Cluster the deduped articles and keep the top 500 largest clusters. Per
+                cluster, sample up to 50 articles and do QA generation with Gemini.
+                <!-- Local 7-day windowed clustering with
+                merging on the deduped articles; keep the top 500 largest clusters. Per
+                cluster, sample up to 50 articles and do QA generation with Gemini. -->
+                <!-- and ask Gemini to extract facts, then
+                feed those facts plus the 50 articles back to Gemini to draft questions
+                whose answer should appear across multiple records. -->
+                <br/><br/>
+                <strong>Filter.</strong> 
+                <!-- Run a closed-book answerability and ambiguity check:  -->
+                Drop questions that are not fully interpretable on their own or
+                Gemini already answers correctly zero-shot.
+                <br/><br/>
+                <strong>Estimate supports.</strong> Embed every article and every surviving
+                QA, retrieve the top-1000 candidate articles per QA, send each candidate
+                with its associated QAs to Gemini for an open-book answer, and use Gemini
+                to judge correctness. Articles judged correct count toward the question's
+                <code>support_count</code>.
+              </aside>
             </div>
           </div>
         </div>
       </div>
 
-      <h2>Results</h2>
+      <h2>The gap under differential privacy</h2>
 
       <p>
-        The headline number is the gap between non-private and DP synthesis. Non-private synthesis
-        (ε = ∞) <strong>nearly matches training on the real corpus</strong> — 92.5% vs 96.4% on
-        Geminon, 65.5% vs 70.4% on News. SOTA DP synthesis <strong>collapses</strong>: 13.7% / 20.6%
-        at ε = 100, and barely above no-training at ε = 10. Private Evolution — a popular
-        training-free DP method — falls <em>below</em> no-training on Geminon, because it can only
-        resample from the base model's proposal distribution, which doesn't contain the fresh facts
-        we test.
+        The main result is simple: <strong/> synthesis works, while DP synthesis mostly does not.</strong>
+        In the standard “fine-tune then sample” pipeline, public synthetic data (ε = ∞) nearly matches the real
+        corpus: 93% vs. 96% on Geminon, and 66% vs. 70% on News. With DP fine-tuning, accuracy drops
+        sharply: 14% / 21% at ε = 100, and barely above no-training at ε = 10. 
+        Another promising training-free DP method, <a href="https://arxiv.org/pdf/2403.01749">Private Evolution</a>, does not close the gap either: it falls <em>below</em> no-training on both Geminon and News.
       </p>
 
       <figure>
@@ -541,27 +677,29 @@
           </g>
         </svg>
         <figcaption>
-          Downstream QA accuracy on ContinuousBench. Non-private synthesis nearly matches the real
-          corpus; SOTA DP synthesis at ε = 100 leaves an 80-point gap on Geminon. Gemma 3 4B,
-          matched generator × evaluator.
+          Downstream QA accuracy for the standard “fine-tune then sample” synthesis pipeline. Non-private
+          synthesis nearly matches the real corpus, while DP synthesis falls far behind. Results use
+          Gemma 3 4B as generator and evaluator.
         </figcaption>
       </figure>
 
       <p>
-        Put differently: DP generators today preserve the <em>form</em> of a corpus — its style,
-        topics, document structure — while losing the specific factual content that makes the data
-        valuable. Between ε = ∞ and ε = 10, MAUVE on Geminon drops by 0.10; QA accuracy drops by
-        88.6 percentage points. A method that cannot recover information attested across hundreds
-        of independent records has not meaningfully preserved the corpus, and closing that gap is
-        the central open problem for DP text synthesis. We hope ContinuousBench can serve as a
-        yardstick.
+        The pattern is clear: today's DP synthetic text can preserve the <em>form</em> of a corpus —
+        its style, topics, and document structure — while losing the factual content that makes the data
+        valuable. On Geminon, for example, going from ε = ∞ to ε = 10 only drops MAUVE by 0.10, but drops
+        QA accuracy by 88.6 points. If a method cannot recover facts repeated across hundreds of
+        independent records, it has not really preserved the corpus :(
       </p>
 
-      <p>
-        <a href="https://huggingface.co/ContinuousBench">Corpus, QA</a>, and
-        <a href="https://github.com/plau666/ContinuousBenchEval">eval harness</a> are released.<br>
-        See more curation and experimental details in <a href="#">paper</a>.
-      </p>
+      <div class="release">
+        <p>
+          <strong>Release.</strong> Closing this gap is a central challenge for DP text synthesis, and a key roadblock for deploying DP in the AI era. We release the
+          <a href="https://huggingface.co/ContinuousBench">corpora and QA sets</a>, along with the
+          <a href="https://github.com/plau666/ContinuousBenchEval">evaluation harness</a>, and we hope
+          ContinuousBench can serve as a yardstick for progress. More curation and experimental details are in the
+          <a href="#">paper</a>.
+        </p>
+      </div>
     </article>
   </main>
   <script>
