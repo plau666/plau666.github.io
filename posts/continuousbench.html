@@ -481,7 +481,7 @@
           like <a href="https://huggingface.co/datasets/stanfordnlp/imdb">IMDB</a> and
           <a href="https://github.com/AI-secure/aug-pe/tree/main/data/openreview">OpenReview</a>
           are saturated — train-on-real beats no-training by only a few points
-          (51% → 62% on IMDB, 94% → 97% on OpenReview),
+          (51% → 62% on OpenReview, 94% → 97% on IMDB),
           leaving no room to distinguish DP synthesis methods.
         </p>
         <p>
@@ -489,7 +489,7 @@
           <strong>~1% → ~97%</strong> on Geminon and from
           <strong>~14% → ~70%</strong> on News. Yet with differential privacy, even at <strong>ε = 100</strong>,
           SOTA DP synthesis only reaches <strong>~4%</strong> on Geminon and
-          <strong>~26%</strong> on News — far below train-on-real.
+          <strong>~26%</strong> on News, nowhere near train-on-real.
         </p>
       </div>
 
@@ -527,7 +527,7 @@
           do not necessarily mean real information transfer.
         </li>
         <li>
-          <strong>Teacher–student distillation muddies the signal.</strong> Synthetic data is often generated
+          <strong>Teacher-student distillation muddies the signal.</strong> Synthetic data is often generated
           by a stronger model and then used to train a weaker model for eval. The gains may come from the
           stronger model teaching the weaker one, rather than from knowledge learned from the private corpus.
         </li>
@@ -650,7 +650,7 @@
       </ul>
 
       <p>
-        To avoid teacher–student confounds, we use the <em>same</em> base checkpoint for the generator
+        To avoid teacher-student confounds, we use the <em>same</em> base checkpoint for the generator
         and the downstream evaluator. Geminon gives us a fully controlled fictional domain for studying
         DP learnability, while News gives us a continuously collected real-world corpus with natural
         messiness and time-evolving facts.
@@ -739,7 +739,7 @@
               <aside class="sidenote">
                 <span class="sidenote-label">How records are generated</span>
                 We prompt Gemini to write articles based on index entries, in several
-                document types — single-Geminon wiki entries and field journals, head-to-head comparisons of two
+                document types: single-Geminon wiki entries and field journals, head-to-head comparisons of two
                 Geminons, and evolutionary-line analyses. During generation we also record which
                 attributes of each Geminon the article actually mentions (the <code>tag</code>
                 field).
@@ -859,8 +859,7 @@
                 <br/><br/>
                 <strong>Filter.</strong> 
                 <!-- Run a closed-book answerability and ambiguity check:  -->
-                Drop questions that are not fully interpretable on their own or
-                Gemini already answers correctly zero-shot.
+                Drop questions that are not fully interpretable on their own, or that Gemini already answers correctly zero-shot.
                 <br/><br/>
                 <strong>Estimate supports.</strong> Embed every article and every surviving
                 QA, retrieve the top-1000 candidate articles per QA, send each candidate
@@ -880,7 +879,7 @@
         In the standard “fine-tune then sample” pipeline, public synthetic data (ε = ∞) nearly matches the real
         corpus.
         <!-- : 93% vs. 96% on Geminon, and 66% vs. 70% on News.  -->
-        With DP, accuracy collapses: on Geminon, DP synthesis reaches only <strong>4%</strong>
+        With DP, accuracy collapses. On Geminon, DP synthesis reaches only <strong>4%</strong>
         at <strong>ε = 100</strong> and <strong>3%</strong> at <strong>ε = 10</strong>.
         On News, it reaches <strong>26%</strong> at <strong>ε = 100</strong>
         and <strong>20%</strong> at <strong>ε = 10</strong> — barely above no-training in both cases. 
@@ -942,7 +941,7 @@
           <g>
             <rect x="595" y="38.28" width="38" height="221.72" class="gem-3"/>
             <rect x="639" y="98.08" width="38" height="161.92" class="news-3"/>
-            <text x="614" y="34" class="vl">96</text>
+            <text x="614" y="34" class="vl">97</text>
             <text x="658" y="94" class="vl">70</text>
             <text x="636" y="278" class="xl">Train on real</text>
           </g>
@@ -963,10 +962,10 @@
       </figure>
 
       <p>
-        The pattern is clear: today's DP synthetic text can preserve the <em>form</em> of a corpus —
-        its style, topics, and document structure — while losing the factual content that makes the data
+        The pattern is clear. Today's DP synthetic text can preserve the <em>form</em> of a corpus, 
+        its style, topics, and document structure, while losing the factual content that makes the data
         valuable. On Geminon, for example, going from ε = ∞ to ε = 10 only drops MAUVE by 0.10, but drops
-        QA accuracy by 88.6 points.
+        QA accuracy by 89%.
         <button type="button" class="inline-expand"
                 aria-controls="failure-mode-block" aria-expanded="false">See example</button>.
         If a method cannot recover facts repeated across hundreds of independent records,
