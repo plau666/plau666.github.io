@@ -540,14 +540,13 @@
           <strong>Teacher-student distillation muddies the signal.</strong> Synthetic data is often generated
           by a stronger model and then used to train a weaker model for eval*. The gains may come from the
           stronger model teaching the weaker one, rather than from knowledge learned from the private corpus.
-          <aside class="sidenote">
+          <!-- <aside class="sidenote">
             <span class="sidenote-label">*In practice</span>
             <a href="https://arxiv.org/abs/2407.12108">Amin et al. (2024)</a> generate DP synthetic text with
             8B and 2B models, then fine-tune a 110M model on it for downstream eval.
             <a href="https://arxiv.org/pdf/2306.01684">Kurakin et al. (2024)</a> similarly used an
             8B generator paired with a 110M evaluator. 
-            <!-- The generator is ~70× the size of the evaluator. -->
-          </aside>
+          </aside> -->
         </li>
       </ol>
 
