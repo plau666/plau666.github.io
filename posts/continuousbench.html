@@ -174,6 +174,7 @@
     .chart .xl.news-label { font-weight: 600; fill: var(--news-3); }
     .chart .vl   { fill: var(--fg); font: 9px -apple-system, system-ui, sans-serif; text-anchor: middle; }
     .chart .lg   { fill: var(--fg); font: 11px -apple-system, system-ui, sans-serif; }
+    .chart .ay-label { fill: var(--muted); font: 11px -apple-system, system-ui, sans-serif; text-anchor: middle; letter-spacing: 0.02em; }
     .chart .gem-1  { fill: var(--gem-1); }
     .chart .gem-2  { fill: var(--gem-2); }
     .chart .gem-3  { fill: var(--gem-3); }
@@ -475,7 +476,7 @@
 
       <div class="tldr">
         <p>
-          <strong>TL;DR.</strong> We built <em>ContinuousBench</em>, a benchmark for
+          <strong>TL;DR.</strong> We built <em>ContinuousBench</em>, a recurringly generated benchmark for
           <strong>whether DP synthetic text retains the corpus-specific knowledge</strong>
           that motivated using a sensitive dataset in the first place. Existing benchmarks
           like <a href="https://huggingface.co/datasets/stanfordnlp/imdb">IMDB</a> and
@@ -497,17 +498,26 @@
 
       <div class="aside-anchor">
         <p>
-          The pitch for DP text synthesis is simple: take a sensitive corpus, e.g. internal docs, and release synthetic text that others can safely use, for example to train models.
+          The pitch for DP text synthesis is simple: take a sensitive corpus, e.g. clinical notes, and release synthetic text that others can safely use, for example to train models.
           But looking similar is not enough. The goal is to <em>preserve the capabilities we would have gained from training on the real data</em>:
-          if the real data would teach a model to answer questions about internal knowledge, the synthetic data should too*.
+          if the real data would teach a model what's in the records and what to do about it, the synthetic data should too*.
         </p>
 
+        <!-- Previous example (support tickets) — kept for future:
         <aside class="sidenote">
           <span class="sidenote-label">*Concrete example</span>
           Think of a company releasing DP synthetic versions of its support tickets. It is not
           enough for the synthetic tickets to sound like support tickets. If the real tickets
           would teach a model which bugs, products, and fixes go together, the synthetic tickets
           should teach that too. Current evaluations often miss this distinction.
+        </aside>
+        -->
+        <aside class="sidenote">
+          <span class="sidenote-label">*Concrete example</span>
+          Think of a hospital releasing DP synthetic clinical notes. It is not enough that they
+          read like clinical notes. If the real notes describe a medical condition across
+          hundreds of independent records, the synthetic notes should teach a model what the
+          condition is, what its symptoms are, and how to treat it.
         </aside>
       </div>
 
@@ -521,15 +531,23 @@
           mean the synthetic data taught it anything new.
         </li>
         <li>
-          <strong>The metrics reward style, not knowledge.</strong> MAUVE, BLEU, classification accuracy, etc. can all improve when the synthetic text only gets the right "vibe".
+          <strong>The metrics reward style, not knowledge.</strong> MAUVE, BLEU, classification accuracy, etc. can all improve when the synthetic text only gets the right "vibe."
           A DP synthetic copy can score
           well on these metrics while losing the specific facts in the source corpus, so good metric scores
           do not necessarily mean real information transfer.
         </li>
-        <li>
+        <li class="aside-anchor">
           <strong>Teacher-student distillation muddies the signal.</strong> Synthetic data is often generated
-          by a stronger model and then used to train a weaker model for eval. The gains may come from the
+          by a stronger model and then used to train a weaker model for eval*. The gains may come from the
           stronger model teaching the weaker one, rather than from knowledge learned from the private corpus.
+          <aside class="sidenote">
+            <span class="sidenote-label">*In practice</span>
+            <a href="https://arxiv.org/abs/2407.12108">Amin et al. (2024)</a> generate DP synthetic text with
+            8B and 2B models, then fine-tune a 110M model on it for downstream eval.
+            <a href="https://arxiv.org/pdf/2306.01684">Kurakin et al. (2024)</a> similarly used an
+            8B generator paired with a 110M evaluator. 
+            <!-- The generator is ~70× the size of the evaluator. -->
+          </aside>
         </li>
       </ol>
 
@@ -552,6 +570,7 @@
             <text x="52" y="148" class="tk" text-anchor="end">50</text>
             <text x="52" y="91"  class="tk" text-anchor="end">75</text>
             <text x="52" y="33"  class="tk" text-anchor="end">100</text>
+            <text class="ay-label" transform="rotate(-90 18 145)" x="18" y="145">Accuracy (%)</text>
           </g>
 
           <!-- Group 1: OpenReview (gray family — saturated benchmark) -->
@@ -622,8 +641,10 @@
       <h2>ContinuousBench</h2>
 
       <p>
-        Each release packages three things: a fresh training corpus, a derived short-answer QA set,
-        and a standardized training/eval harness. The benchmark is built around three design goals:
+        ContinuousBench is released on a recurring schedule, so it stays ahead of new model
+        knowledge cutoffs. Each release packages three things: a fresh training corpus,
+        a derived short-answer QA set, and a standardized training/eval harness. The benchmark is
+        built around three design goals:
       </p>
 
       <ul>
@@ -650,10 +671,11 @@
       </ul>
 
       <p>
-        To avoid teacher-student confounds, we use the <em>same</em> base checkpoint for the generator
-        and the downstream evaluator. Geminon gives us a fully controlled fictional domain for studying
-        DP learnability, while News gives us a continuously collected real-world corpus with natural
-        messiness and time-evolving facts.
+        To make sure downstream gains reflect knowledge the synthetic data carries, rather than
+        the generator simply being more capable than the evaluator, we use the <em>same</em>
+        model checkpoint for the generator and the downstream evaluator. Geminon gives us a fully
+        controlled fictional domain for studying DP learnability, while News gives us a continuously
+        collected real-world corpus with natural messiness and time-evolving facts.
       </p>
 
       <div class="tabs" data-tabs>
@@ -900,6 +922,7 @@
           <text x="52" y="148" class="tk" text-anchor="end">50</text>
           <text x="52" y="91"  class="tk" text-anchor="end">75</text>
           <text x="52" y="33"  class="tk" text-anchor="end">100</text>
+          <text class="ay-label" transform="rotate(-90 18 145)" x="18" y="145">Accuracy (%)</text>
 
           <!-- Group 1: No training -->
           <g>
@@ -1002,7 +1025,7 @@
     // Dedent <pre><code> blocks so source HTML can be indented naturally.
     // Skips blocks marked .prose (single flowing line).
     document.querySelectorAll('.pipeline pre:not(.prose) code').forEach(code => {
-      let text = code.textContent.replace(/^[ \t]*\n/, '').replace(/\n[ \t]*$/, '');
+      let text = code.textContent.replace(/^[ \t]*\n/, '').regiplace(/\n[ \t]*$/, '');
       const indents = text.split('\n').filter(l => l.trim()).map(l => l.match(/^[ \t]*/)[0].length);
       const min = indents.length ? Math.min(...indents) : 0;
       code.textContent = text.split('\n').map(l => l.slice(min)).join('\n');
@@ -1045,7 +1068,7 @@
       });
     });
   </script>
-  <script data-goatcounter="https://peihanliu.goatcounter.com/count"
+  <script data-goatcounter="https://YOUR-CODE.goatcounter.com/count"
           async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
