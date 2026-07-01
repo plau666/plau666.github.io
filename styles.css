@@ -110,6 +110,10 @@ section { margin-bottom: 1.5rem; }
   border-top: 1px solid var(--rule);
 }
 
+.entries > li {
+  padding: 0.55rem 0;
+}
+
 .entries > li:first-child,
 .posts > li:first-child {
   border-top: none;
