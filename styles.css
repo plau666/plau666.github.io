@@ -172,6 +172,14 @@ figcaption {
   margin-bottom: 1rem;
 }
 
+.pubs .tag {
+  color: var(--accent);
+}
+
+.pubs .also {
+  color: var(--muted);
+}
+
 .pubs u {
   text-decoration: none;
   border-bottom: 1px solid var(--fg);
